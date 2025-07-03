@@ -2,9 +2,20 @@
 <script>
   import { onMount } from 'svelte';
   import { marked } from 'marked';
+  import hljs from 'highlight.js';
   let markdown = '# stupidmarkdown\n\nStart typing your Markdown on the left.';
   let html = '';
   let dark = true;
+
+  // Configure marked to use highlight.js for code blocks (let marked handle escaping)
+  marked.setOptions({
+    highlight: function(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, { language: lang }).value;
+      }
+      return hljs.highlightAuto(code).value;
+    }
+  });
 
   function updatePreview() {
     html = marked.parse(markdown);
@@ -134,10 +145,10 @@
     background: var(--preview-bg);
     overflow-y: auto;
     padding: var(--pane-padding);
-    display: flex;
-    flex-direction: column;
+    display: block;
     border-top-right-radius: var(--pane-radius);
     border-bottom-right-radius: var(--pane-radius);
+    text-align: left;
   }
   textarea {
     flex: 1;
@@ -155,11 +166,15 @@
   }
   .markdown-body {
     max-width: 48em;
-    margin: 0 auto;
+    margin: 0;
     line-height: 1.6;
     color: var(--fg);
     font-size: 1.05em;
     word-break: break-word;
+    text-align: left;
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
   }
   .markdown-body img {
     max-width: 100%;
@@ -168,5 +183,14 @@
     margin: 1.5em auto;
     border-radius: 0.7em;
     box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+  }
+  .markdown-body pre code.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 1em;
+    border-radius: 0.5em;
+    font-size: 1em;
+    font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', monospace;
+    text-align: left;
   }
 </style>
